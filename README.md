@@ -1,2 +1,2 @@
-# FloatMLFFuser
-Machine learn feature fusion which accepts float values as input.
+# MLFeatureFuser
+Performs early fusion of features
