@@ -12,7 +12,7 @@ import org.openimaj.util.pair.IntFloatPair;
 
 import com.opencsv.CSVReader;
 
-public class MLFeatureFuser 
+public class FloatMLFFuser 
 {
 	private static int k;
 	private static int clusteringSteps;
@@ -47,7 +47,7 @@ public class MLFeatureFuser
     			double fv[] = new double[fvSize];
     			for(int j = 0; j < fvSize; j++)
     			{
-    				fv[j] = Integer.parseInt(line[j + 1]);
+    				fv[j] = Float.parseFloat(line[j + 1]);
     				if(fv[j] > maxValue)
     				{
     					maxValue = (int)fv[j];
