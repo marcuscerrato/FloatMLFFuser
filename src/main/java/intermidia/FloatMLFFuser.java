@@ -75,7 +75,8 @@ public class FloatMLFFuser
     		//Sums all feature vector lengths for all different types
     		featureWords += featureArrays.get(featureTypes).get(0).length();    		    		
     		featureReader.close();
-    	}
+    	}    	
+    	
     	
     	//Relate each word with its modality
     	int insertedFeatureSum = 0;
