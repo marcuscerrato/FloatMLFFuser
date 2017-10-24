@@ -5,10 +5,10 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 
 import org.openimaj.math.statistics.distribution.Histogram;
-import org.openimaj.ml.clustering.IntCentroidsResult;
+import org.openimaj.ml.clustering.DoubleCentroidsResult;
 import org.openimaj.ml.clustering.assignment.HardAssigner;
-import org.openimaj.ml.clustering.kmeans.IntKMeans;
-import org.openimaj.util.pair.IntFloatPair;
+import org.openimaj.ml.clustering.kmeans.DoubleKMeans;
+import org.openimaj.util.pair.IntDoublePair;
 
 import com.opencsv.CSVReader;
 
@@ -43,11 +43,11 @@ public class FloatMLFFuser
     		int maxValue = 0;
     		while ((line = featureReader.readNext()) != null) 
     		{		
-    			int fvSize = line.length - 1;
+    			int fvSize = line.length - 1;    			
     			double fv[] = new double[fvSize];
     			for(int j = 0; j < fvSize; j++)
     			{
-    				fv[j] = Float.parseFloat(line[j + 1]);
+    				fv[j] = Double.parseDouble(line[j + 1]);
     				if(fv[j] > maxValue)
     				{
     					maxValue = (int)fv[j];
@@ -93,7 +93,7 @@ public class FloatMLFFuser
     	
     	//Compute the transpose matrix
     	shots = featureArrays.get(0).size();
-    	int[][] featurePool = new int[featureWords][shots];
+    	double[][] featurePool = new double[featureWords][shots];
     	insertedFeatureSum = 0;    	
     	for(ArrayList<Histogram> arrayList: featureArrays)
     	{
@@ -102,7 +102,7 @@ public class FloatMLFFuser
     		{
     			for(int j = 0; j < histogram.getVector().length; j++)
     			{
-    				featurePool[insertedFeatureSum + j][shot] = (int) histogram.get(j);
+    				featurePool[insertedFeatureSum + j][shot] = histogram.get(j);
     			}
     			shot++;
     		}
@@ -111,9 +111,9 @@ public class FloatMLFFuser
     	}
     	
     	//Performs clustering of the feature words by their shot histograms
-    	IntKMeans clusterer = IntKMeans.createExact(k, clusteringSteps);
-    	IntCentroidsResult centroids = clusterer.cluster(featurePool);
-    	HardAssigner<int[], float[], IntFloatPair> hardAssigner = centroids.defaultHardAssigner();
+    	DoubleKMeans clusterer = DoubleKMeans.createExact(k, clusteringSteps);
+    	DoubleCentroidsResult centroids = clusterer.cluster(featurePool);
+    	HardAssigner<double[], double[], IntDoublePair> hardAssigner = centroids.defaultHardAssigner();
     	
     	//Assign each feature word to a cluster that correspond a multimodal feature
     	ArrayList<ArrayList<Integer>> featureGroups = new ArrayList<ArrayList<Integer>>();
@@ -130,7 +130,7 @@ public class FloatMLFFuser
      	}
     	
     	//Compute multimodal words histograms by average pooling    	
-    	int[][] h;
+    	double[][] h;
     	switch(poolingMode)
     	{
     		//Jhuo et al. Average Pooling Strategy 
@@ -191,10 +191,10 @@ public class FloatMLFFuser
     	//System.out.println("Fusion process terminated.");
    }
 
-    private static int[][] jhuoAveragePooling(ArrayList<ArrayList<Integer>> featureGroups, ArrayList<Integer> vectorModality, int vectorModalities,  int featurePool[][], int shots, int k)
+    private static double[][] jhuoAveragePooling(ArrayList<ArrayList<Integer>> featureGroups, ArrayList<Integer> vectorModality, int vectorModalities,  double featurePool[][], int shots, int k)
     {   	    	
     	double[][] hJhuoAvg = new double[shots][k]; 
-    	int[][] intHJhuoAvg = new int[shots][k];
+    	double[][] doubleHJhuoAvg = new double[shots][k];
     	for(int i = 0; i < shots; i++)
     	{	
     		for(int j = 0; j < k; j++)
@@ -230,25 +230,25 @@ public class FloatMLFFuser
     				}
     			} 
     			hJhuoAvg[i][j] = sum / featureGroups.get(j).size();
-    			intHJhuoAvg[i][j] = (int)Math.ceil(hJhuoAvg[i][j]);
+    			doubleHJhuoAvg[i][j] = Math.ceil(hJhuoAvg[i][j]);
     		}
     	}
-    	return intHJhuoAvg;
+    	return doubleHJhuoAvg;
     }
 
     
-    private static int[][] averagePooling(ArrayList<ArrayList<Integer>> featureGroups, int featurePool[][], int shots, int k, boolean boost)
+    private static double[][] averagePooling(ArrayList<ArrayList<Integer>> featureGroups, double featurePool[][], int shots, int k, boolean boost)
     {
-    	int[][] havg = new int[shots][k]; 
+    	double[][] havg = new double[shots][k]; 
     	for(int i = 0; i < shots; i++)
     	{	
     		for(int j = 0; j < k; j++)
     		{	   			
     			//Sum calculation, gather all values of a multimodal word:
-    			int sum = 0;
+    			double sum = 0;
     			for(Integer val: featureGroups.get(j))
     			{
-    				sum += featurePool[val][i];
+    				sum += featurePool[val][i];    				    			
     			}
     			//To avoid division by 0 when there are empty clusters.
     			if(featureGroups.get(j).size() > 0)
@@ -270,15 +270,15 @@ public class FloatMLFFuser
     	return havg;
     }
     
-    private static int[][] maxPooling(ArrayList<ArrayList<Integer>> featureGroups, int featurePool[][], int shots, int k, boolean boost)
+    private static double[][] maxPooling(ArrayList<ArrayList<Integer>> featureGroups, double featurePool[][], int shots, int k, boolean boost)
     {
-    	int[][] hmax = new int[shots][k]; 
+    	double[][] hmax = new double[shots][k]; 
     	for(int i = 0; i < shots; i++)
     	{	
     		for(int j = 0; j < k; j++)
     		{	
     			//Select maximum value from a multimodal word ocurrence
-    			int max = -1;
+    			double max = -1;
     			for(Integer val: featureGroups.get(j))
     			{
     				if(featurePool[val][i] > max)
