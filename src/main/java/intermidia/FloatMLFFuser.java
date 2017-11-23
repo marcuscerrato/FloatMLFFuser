@@ -40,7 +40,7 @@ public class FloatMLFFuser
     		CSVReader featureReader = new CSVReader(new FileReader(args[featureTypes]), ' ');
     		String[] line;
     		featureArrays.add(new ArrayList<Histogram>());
-    		int maxValue = 0;
+    		double maxValue = Double.MIN_VALUE;
     		while ((line = featureReader.readNext()) != null) 
     		{		
     			int fvSize = line.length - 1;    			
@@ -50,7 +50,7 @@ public class FloatMLFFuser
     				fv[j] = Double.parseDouble(line[j + 1]);
     				if(fv[j] > maxValue)
     				{
-    					maxValue = (int)fv[j];
+    					maxValue = fv[j];
     				}   
     			}
     			featureArrays.get(featureTypes).add(new Histogram(fv));    			
