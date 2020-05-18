@@ -13,6 +13,11 @@
   </properties>
   <dependencies>
     <dependency>
+    	<groupId>intermidia</groupId>
+    	<artifactId>TVSSFramework</artifactId>
+    	<version>1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
       <groupId>org.openimaj</groupId>
       <artifactId>audio-processing</artifactId>
       <version>${openimaj.version}</version>
